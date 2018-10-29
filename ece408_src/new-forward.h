@@ -39,6 +39,7 @@ void forward(mshadow::Tensor<cpu, 4, DType> &y, const mshadow::Tensor<cpu, 4, DT
                             for (int p = K; p--; )
                                 y[b][m][h][w] += x[b][c][h+p][w+q]*k[m][c][p][q];
                 }
+
 }
 }
 }
