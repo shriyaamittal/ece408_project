@@ -245,9 +245,11 @@ For example, you could modify `rai_build.yml` to run
 
 | Model | Number of Images | Correctness  |
 |-------------| -----| -----  |
+| ece408 | 100       | 0.85 |
+| ece408 | 1000      | 0.827 |
 | ece408 | 10000 (default) | 0.8171 |
 
-(We dont support any other model for FALL 2018 semester apart from listed above. Dont try with the optional argument. It will not work. We might plan to provide another model for correctness check. - probably during ML3. Final model that will be used for internal evaluation shall be different.)
+(Final model that will be used for internal evaluation shall be different.)
 
 The provided `m2.1.py` is identical to the one used by `--submit=m2`.
 You may modify `m2.1.py` as you please, but check that `--submit=m2` will still invoke your code correctly.
@@ -266,6 +268,7 @@ Due November 16 @ 5pm
 | ------------ |
 | Everything from Milestone 2 |
 | Implement a GPU Convolution |
+| Correctness and timing with 3 different dataset sizes |
 | Report: demonstrate `nvprof` profiling the execution |
 | Use `rai -p <project folder> --queue rai_amd64_ece408 --submit=m3` to mark your job for grading |
 
@@ -282,6 +285,10 @@ When it is correct, it will show the same correctness as Milestone 2.
 
 ### Use `nvprof` and NVVP for initial Performance Results
 
+First, ensure you are using correct image in rai_build.yml file
+
+`image: illinoisimpact/ece408_mxnet_docker:amd64-gpu-latest`
+
 Modify `rai_build.yml` to use nvprof to save some timeline and analysis information, as described in [nvprof](#profiling).
 Use the NVIDIA Visual Profiler to find the execution of your kernel, and show it in your report.
 The [NVVP on EWS](#nvvp-on-ews) section describes how to install NVVP.
@@ -291,6 +298,22 @@ Use
     rai -p <project folder> --queue rai_amd64_ece408 --submit=m3
 
 to mark your submission.
+
+`m3.1.py` takes one optional argument: the dataset size. 
+If the correctness for each possible model is as below, you can be reasonably confident your implementation is right.
+The correctness does depend on the data size. 
+
+For example, you could modify `rai_build.yml` to run
+
+    python m3.1.py 10000
+
+| Model | Number of Images | Correctness  |
+|-------------| -----| -----  |
+| ece408 | 100       | 0.85 |
+| ece408 | 1000      | 0.827 |
+| ece408 | 10000 (default) | 0.8171 |
+
+(Final model that will be used for internal evaluation shall be different.)
 
 ## Milestone 4
 
@@ -451,9 +474,10 @@ This will generate timeline.nvprof.
 You can additionally gather some detailed performance metrics.
 
     nvprof -o timeline.nvprof <your command here>
-    nvprof --analysis-metrics -o analysis.nvprof <the same command>
+    nvprof --kernels "::forward:1" --analysis-metrics -o forward1_analysis.nvprof <the same command>
+    nvprof --kernels "::forward:2" --analysis-metrics -o forward2_analysis.nvprof <the same command>
 
-This will generate `timeline.nvprof` and `analysis.nvprof`.
+This will generate `timeline.nvprof` and `*analysis.nvprof`.
 `--analysis-metrics` significantly slows the run time, you may wish to modify the python scripts to run on smaller datasets during this profiling.
 
 You will need to follow the link rai prints after the execution to retrieve these files.
